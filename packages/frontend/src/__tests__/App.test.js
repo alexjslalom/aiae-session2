@@ -104,8 +104,8 @@ describe('App Component', () => {
     await act(async () => {
       render(<App />);
     });
-    expect(screen.getByText('To Do App')).toBeInTheDocument();
-    expect(screen.getByText('Keep track of your tasks')).toBeInTheDocument();
+    expect(screen.getByTestId('app-title')).toBeInTheDocument();
+    expect(screen.getByTestId('app-subtitle')).toBeInTheDocument();
   });
 
   test('loads and displays items with new fields', async () => {
@@ -114,19 +114,18 @@ describe('App Component', () => {
     });
     
     // Initially shows loading state
-    expect(screen.getByText('Loading data...')).toBeInTheDocument();
+    expect(screen.getByTestId('loading-state')).toBeInTheDocument();
     
     // Wait for items to load
     await waitFor(() => {
-      expect(screen.getByText('Test Item 1')).toBeInTheDocument();
-      expect(screen.getByText('Test Item 2')).toBeInTheDocument();
-      expect(screen.getByText('First task')).toBeInTheDocument();
-      expect(screen.getByText('Second task')).toBeInTheDocument();
+      expect(screen.getByTestId('item-name-1')).toHaveTextContent('Test Item 1');
+      expect(screen.getByTestId('item-name-2')).toHaveTextContent('Test Item 2');
+      expect(screen.getByTestId('item-details-1')).toHaveTextContent('First task');
+      expect(screen.getByTestId('item-details-2')).toHaveTextContent('Second task');
     });
 
     // Check priority badges
-    const highPriorityBadges = screen.getAllByText('HIGH');
-    expect(highPriorityBadges.length).toBeGreaterThan(0);
+    expect(screen.getByTestId('item-priority-1')).toHaveTextContent('HIGH');
   });
 
   test('adds a new item with all fields', async () => {
@@ -138,13 +137,13 @@ describe('App Component', () => {
     
     // Wait for items to load
     await waitFor(() => {
-      expect(screen.queryByText('Loading data...')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('loading-state')).not.toBeInTheDocument();
     });
     
     // Fill in the form and submit
-    const nameInput = screen.getByPlaceholderText('Enter item name');
-    const detailsInput = screen.getByPlaceholderText('Add details (optional)');
-    const prioritySelect = screen.getAllByRole('combobox')[0];
+    const nameInput = screen.getByTestId('new-item-name-input');
+    const detailsInput = screen.getByTestId('new-item-details-input');
+    const prioritySelect = screen.getByTestId('new-item-priority-select');
     
     await act(async () => {
       await user.type(nameInput, 'New Test Item');
@@ -152,14 +151,14 @@ describe('App Component', () => {
       await user.selectOptions(prioritySelect, 'HIGH');
     });
     
-    const submitButton = screen.getByText('Add Item');
+    const submitButton = screen.getByTestId('add-item-submit-button');
     await act(async () => {
       await user.click(submitButton);
     });
     
     // Check that the new item appears
     await waitFor(() => {
-      expect(screen.getByText('New Test Item')).toBeInTheDocument();
+      expect(screen.getByTestId('item-name-3')).toHaveTextContent('New Test Item');
     });
   });
 
@@ -172,19 +171,18 @@ describe('App Component', () => {
     
     // Wait for items to load
     await waitFor(() => {
-      expect(screen.getByText('Test Item 1')).toBeInTheDocument();
+      expect(screen.getByTestId('item-1')).toBeInTheDocument();
     });
     
     // Find and click the checkbox for first item
-    const checkboxes = screen.getAllByRole('checkbox');
+    const checkbox = screen.getByTestId('item-checkbox-1');
     await act(async () => {
-      await user.click(checkboxes[0]);
+      await user.click(checkbox);
     });
 
     // Should show item as completed (in a completed class)
     await waitFor(() => {
-      const items = screen.getAllByText('Test Item 1');
-      expect(items.length).toBeGreaterThan(0);
+      expect(screen.getByTestId('item-1')).toHaveClass('completed');
     });
   });
 
@@ -197,35 +195,36 @@ describe('App Component', () => {
     
     // Wait for items to load
     await waitFor(() => {
-      expect(screen.getByText('Test Item 1')).toBeInTheDocument();
+      expect(screen.getByTestId('item-1')).toBeInTheDocument();
     });
     
     // Click Edit button
-    const editButtons = screen.getAllByText('Edit');
+    const editButton = screen.getByTestId('item-edit-1');
     await act(async () => {
-      await user.click(editButtons[0]);
+      await user.click(editButton);
     });
 
     // Modal should open with the edit form
     await waitFor(() => {
-      expect(screen.getByDisplayValue('Test Item 1')).toBeInTheDocument();
+      expect(screen.getByTestId('edit-modal')).toBeInTheDocument();
     });
 
     // Update the name and save
-    const nameInput = screen.getByDisplayValue('Test Item 1');
+    const nameInput = screen.getByTestId('edit-item-name-input');
     await act(async () => {
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Item Name');
     });
 
-    const saveButton = screen.getByText('Save Changes');
+    const saveButton = screen.getByTestId('edit-item-save-button');
     await act(async () => {
       await user.click(saveButton);
     });
 
     // Modal should close and updated item should appear
     await waitFor(() => {
-      expect(screen.getByText('Updated Item Name')).toBeInTheDocument();
+      expect(screen.queryByTestId('edit-modal')).not.toBeInTheDocument();
+      expect(screen.getByTestId('item-name-1')).toHaveTextContent('Updated Item Name');
     });
   });
 
@@ -243,7 +242,7 @@ describe('App Component', () => {
     
     // Wait for error message
     await waitFor(() => {
-      expect(screen.getByText(/Failed to fetch data/)).toBeInTheDocument();
+      expect(screen.getByTestId('error-state')).toHaveTextContent('Failed to fetch data');
     });
   });
 
@@ -261,7 +260,7 @@ describe('App Component', () => {
     
     // Wait for empty state message
     await waitFor(() => {
-      expect(screen.getByText('No items found. Add some!')).toBeInTheDocument();
+      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
     });
   });
 });
