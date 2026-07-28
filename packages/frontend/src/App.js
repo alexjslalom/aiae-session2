@@ -76,8 +76,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>To Do App</h1>
-        <p>Keep track of your tasks</p>
+        <h1 data-testid="app-title">To Do App</h1>
+        <p data-testid="app-subtitle">Keep track of your tasks</p>
       </header>
 
       <main>
@@ -85,28 +85,30 @@ function App() {
           <h2>Add New Item</h2>
           <form onSubmit={handleSubmit}>
             <input
+              data-testid="new-item-input"
               type="text"
               value={newItem}
               onChange={(e) => setNewItem(e.target.value)}
               placeholder="Enter item name"
             />
-            <button type="submit">Add Item</button>
+            <button data-testid="add-item-button" type="submit">Add Item</button>
           </form>
         </section>
 
         <section className="items-section">
           <h2>Items from Database</h2>
-          {loading && <p>Loading data...</p>}
-          {error && <p className="error">{error}</p>}
+          {loading && <p data-testid="loading-message">Loading data...</p>}
+          {error && <p data-testid="error-message" className="error">{error}</p>}
           {!loading && !error && (
             <ul>
               {data.length > 0 ? (
                 data.map((item) => (
-                  <li key={item.id}>
-                    <span>{item.name}</span>
+                  <li key={item.id} data-testid={`item-${item.id}`}>
+                    <span data-testid={`item-name-${item.id}`}>{item.name}</span>
                     <button 
                       onClick={() => handleDelete(item.id)}
                       className="delete-btn"
+                      data-testid={`delete-item-${item.id}`}
                       type="button"
                     >
                       Delete
@@ -114,7 +116,7 @@ function App() {
                   </li>
                 ))
               ) : (
-                <p>No items found. Add some!</p>
+                <p data-testid="empty-state-message">No items found. Add some!</p>
               )}
             </ul>
           )}

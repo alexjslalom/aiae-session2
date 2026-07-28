@@ -50,8 +50,8 @@ describe('App Component', () => {
     await act(async () => {
       render(<App />);
     });
-    expect(screen.getByText('React Frontend with Node Backend')).toBeInTheDocument();
-    expect(screen.getByText('Connected to in-memory database')).toBeInTheDocument();
+    expect(screen.getByTestId('app-title')).toBeInTheDocument();
+    expect(screen.getByTestId('app-subtitle')).toBeInTheDocument();
   });
 
   test('loads and displays items', async () => {
@@ -60,12 +60,12 @@ describe('App Component', () => {
     });
     
     // Initially shows loading state
-    expect(screen.getByText('Loading data...')).toBeInTheDocument();
+    expect(screen.getByTestId('loading-message')).toBeInTheDocument();
     
     // Wait for items to load
     await waitFor(() => {
-      expect(screen.getByText('Test Item 1')).toBeInTheDocument();
-      expect(screen.getByText('Test Item 2')).toBeInTheDocument();
+      expect(screen.getByTestId('item-name-1')).toBeInTheDocument();
+      expect(screen.getByTestId('item-name-2')).toBeInTheDocument();
     });
   });
 
@@ -78,23 +78,23 @@ describe('App Component', () => {
     
     // Wait for items to load
     await waitFor(() => {
-      expect(screen.queryByText('Loading data...')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('loading-message')).not.toBeInTheDocument();
     });
     
     // Fill in the form and submit
-    const input = screen.getByPlaceholderText('Enter item name');
+    const input = screen.getByTestId('new-item-input');
     await act(async () => {
       await user.type(input, 'New Test Item');
     });
     
-    const submitButton = screen.getByText('Add Item');
+    const submitButton = screen.getByTestId('add-item-button');
     await act(async () => {
       await user.click(submitButton);
     });
     
     // Check that the new item appears
     await waitFor(() => {
-      expect(screen.getByText('New Test Item')).toBeInTheDocument();
+      expect(screen.getByTestId('item-name-3')).toBeInTheDocument();
     });
   });
 
@@ -112,7 +112,7 @@ describe('App Component', () => {
     
     // Wait for error message
     await waitFor(() => {
-      expect(screen.getByText(/Failed to fetch data/)).toBeInTheDocument();
+      expect(screen.getByTestId('error-message')).toBeInTheDocument();
     });
   });
 
@@ -130,7 +130,7 @@ describe('App Component', () => {
     
     // Wait for empty state message
     await waitFor(() => {
-      expect(screen.getByText('No items found. Add some!')).toBeInTheDocument();
+      expect(screen.getByTestId('empty-state-message')).toBeInTheDocument();
     });
   });
 });
